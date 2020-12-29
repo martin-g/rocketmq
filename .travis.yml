@@ -1,4 +1,4 @@
-dist: bionic
+dist: trusty
 
 notifications:
   email:
@@ -11,11 +11,6 @@ language: java
 
 jdk:
   - oraclejdk8
-
-addons:
-  apt:
-    packages:
-      - openjdk-8-jdk
 
 matrix:
   include:
@@ -34,7 +29,13 @@ before_install:
   - echo 'MAVEN_OPTS="$MAVEN_OPTS -Xmx1024m -XX:MaxPermSize=512m -XX:+BytecodeVerificationLocal"' >> ~/.mavenrc
   - cat ~/.mavenrc
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_CPU_ARCH" == "amd64" ]]; then jdk_switcher use "$CUSTOM_JDK"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_CPU_ARCH" == "amd64" ]]; then jdk_switcher use "$CUSTOM_JDK"; fi
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_CPU_ARCH" == "arm64" ]]; then sudo apt install -y openjdk-8-jdk maven; fi
+  - java -version
+  - mvn -version
+
 
 script:
   - travis_retry mvn -B clean apache-rat:check
